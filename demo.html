@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,7 +10,10 @@
 
   .container { max-width: 720px; margin: 40px auto; padding: 0 16px; }
 
-  h1 { font-size: 22px; font-weight: 600; margin-bottom: 4px; }
+  .header { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 4px; }
+  h1 { font-size: 22px; font-weight: 600; }
+  .lang-toggle { font-size: 13px; color: #6366f1; cursor: pointer; user-select: none; }
+  .lang-toggle:hover { text-decoration: underline; }
   .subtitle { color: #666; font-size: 14px; margin-bottom: 24px; }
 
   .card { background: #fff; border-radius: 12px; padding: 20px; margin-bottom: 16px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
@@ -47,36 +50,39 @@
 </head>
 <body>
 <div class="container">
-  <h1>BridgeAI</h1>
-  <p class="subtitle">多模型路由网关 · 填入 Key 即可使用</p>
+  <div class="header">
+    <h1>BridgeAI</h1>
+    <span class="lang-toggle" onclick="toggleLang()" id="langBtn">中文</span>
+  </div>
+  <p class="subtitle" id="subtitle">Multi-model routing gateway · Enter your key to get started</p>
 
   <div class="card">
     <div class="row">
       <div>
-        <label>API Key</label>
+        <label id="labelKey">API Key</label>
         <input id="apiKey" type="password" placeholder="bridge-xxx" />
       </div>
       <div>
-        <label>模型</label>
+        <label id="labelModel">Model</label>
         <select id="model">
-          <option value="smart-fast">smart-fast（快速）</option>
-          <option value="smart-quality">smart-quality（高质量）</option>
+          <option value="smart-fast" id="optFast">smart-fast (Fast)</option>
+          <option value="smart-quality" id="optQuality">smart-quality (Quality)</option>
         </select>
       </div>
     </div>
 
     <div style="margin-bottom:14px">
-      <label>消息内容</label>
-      <textarea id="prompt" placeholder="输入你想问的问题..."></textarea>
+      <label id="labelPrompt">Message</label>
+      <textarea id="prompt" placeholder="Type your question here..."></textarea>
     </div>
 
-    <button id="sendBtn" onclick="send()">发送</button>
+    <button id="sendBtn" onclick="send()">Send</button>
     <div id="error" class="error"></div>
   </div>
 
   <div class="card">
-    <label>回复</label>
-    <div id="output" class="output empty">回复将显示在这里...</div>
+    <label id="labelReply">Reply</label>
+    <div id="output" class="output empty">Response will appear here...</div>
     <div id="meta" class="meta"></div>
   </div>
 </div>
@@ -84,7 +90,74 @@
 <script>
 const API_BASE = "https://bridgeai-production-e475.up.railway.app/v1";
 
+const i18n = {
+  en: {
+    title: "BridgeAI",
+    subtitle: "Multi-model routing gateway · Enter your key to get started",
+    labelKey: "API Key",
+    labelModel: "Model",
+    optFast: "smart-fast (Fast)",
+    optQuality: "smart-quality (Quality)",
+    labelPrompt: "Message",
+    promptPlaceholder: "Type your question here...",
+    sendBtn: "Send",
+    sending: "Sending...",
+    labelReply: "Reply",
+    outputEmpty: "Response will appear here...",
+    errNoKey: "Please enter your API Key",
+    errNoPrompt: "Please enter a message",
+    metaTemplate: (elapsed, provider, id) => `${elapsed}s · Provider: ${provider} · request_id: ${id}`,
+    langBtn: "中文",
+  },
+  zh: {
+    title: "桥智",
+    subtitle: "多模型路由网关 · 填入 Key 即可使用",
+    labelKey: "API Key",
+    labelModel: "模型",
+    optFast: "smart-fast（快速）",
+    optQuality: "smart-quality（高质量）",
+    labelPrompt: "消息内容",
+    promptPlaceholder: "输入你想问的问题...",
+    sendBtn: "发送",
+    sending: "请求中...",
+    labelReply: "回复",
+    outputEmpty: "回复将显示在这里...",
+    errNoKey: "请填入 API Key",
+    errNoPrompt: "请输入内容",
+    metaTemplate: (elapsed, provider, id) => `耗时 ${elapsed}s · 供应商 ${provider} · request_id ${id}`,
+    langBtn: "English",
+  }
+};
+
+let lang = "en";
+
+function toggleLang() {
+  lang = lang === "en" ? "zh" : "en";
+  applyLang();
+}
+
+function applyLang() {
+  const t = i18n[lang];
+  document.querySelector("h1").textContent = t.title;
+  document.getElementById("subtitle").textContent = t.subtitle;
+  document.getElementById("labelKey").textContent = t.labelKey;
+  document.getElementById("labelModel").textContent = t.labelModel;
+  document.getElementById("optFast").textContent = t.optFast;
+  document.getElementById("optQuality").textContent = t.optQuality;
+  document.getElementById("labelPrompt").textContent = t.labelPrompt;
+  document.getElementById("prompt").placeholder = t.promptPlaceholder;
+  document.getElementById("sendBtn").textContent = t.sendBtn;
+  document.getElementById("labelReply").textContent = t.labelReply;
+  document.getElementById("langBtn").textContent = t.langBtn;
+  const output = document.getElementById("output");
+  if (output.classList.contains("empty")) {
+    output.textContent = t.outputEmpty;
+  }
+  document.documentElement.lang = lang;
+}
+
 async function send() {
+  const t = i18n[lang];
   const key = document.getElementById("apiKey").value.trim();
   const model = document.getElementById("model").value;
   const prompt = document.getElementById("prompt").value.trim();
@@ -94,11 +167,11 @@ async function send() {
   const error = document.getElementById("error");
 
   error.textContent = "";
-  if (!key) { error.textContent = "请填入 API Key"; return; }
-  if (!prompt) { error.textContent = "请输入内容"; return; }
+  if (!key) { error.textContent = t.errNoKey; return; }
+  if (!prompt) { error.textContent = t.errNoPrompt; return; }
 
   btn.disabled = true;
-  btn.textContent = "请求中...";
+  btn.textContent = t.sending;
   output.className = "output";
   output.textContent = "";
   meta.textContent = "";
@@ -151,13 +224,13 @@ async function send() {
     const elapsed = ((Date.now() - start) / 1000).toFixed(2);
     const requestId = res.headers.get("X-BridgeAI-Request-Id") || "-";
     const provider = res.headers.get("X-BridgeAI-Provider") || "-";
-    meta.textContent = `耗时 ${elapsed}s · 供应商 ${provider} · request_id ${requestId}`;
+    meta.textContent = t.metaTemplate(elapsed, provider, requestId);
 
   } catch (e) {
     error.textContent = e.message;
   } finally {
     btn.disabled = false;
-    btn.textContent = "发送";
+    btn.textContent = t.sendBtn;
   }
 }
 

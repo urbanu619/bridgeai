@@ -1,8 +1,8 @@
 FROM golang:alpine AS builder
 WORKDIR /app
-COPY go.mod go.sum ./
+COPY internal/gateway/go.mod internal/gateway/go.sum ./
 RUN go mod download
-COPY . .
+COPY internal/gateway/ .
 RUN go build -o gateway .
 
 FROM alpine:latest

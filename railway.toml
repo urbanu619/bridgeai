@@ -1,0 +1,9 @@
+[build]
+builder = "dockerfile"
+dockerfilePath = "internal/gateway/Dockerfile"
+
+[deploy]
+startCommand = "./gateway"
+healthcheckPath = "/health"
+healthcheckTimeout = 30
+restartPolicyType = "on_failure"

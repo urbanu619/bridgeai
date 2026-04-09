@@ -17,6 +17,9 @@ func main() {
 
 	r := gin.Default()
 	r.Use(RequestIDMiddleware())
+	r.GET("/health", func(c *gin.Context) {
+		c.JSON(200, gin.H{"status": "ok"})
+	})
 	r.Use(AuthMiddleware(store))
 	r.POST("/v1/chat/completions", chain.ChatCompletions)
 

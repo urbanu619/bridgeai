@@ -17,6 +17,7 @@ func main() {
 
 	r := gin.Default()
 	r.Use(RequestIDMiddleware())
+	r.Use(CORSMiddleware())
 	r.GET("/health", func(c *gin.Context) {
 		c.JSON(200, gin.H{"status": "ok"})
 	})

@@ -61,6 +61,9 @@
       <div>
         <label id="labelKey">API Key</label>
         <input id="apiKey" type="password" placeholder="bridge-xxx" />
+        <div style="margin-top:5px;font-size:12px;color:#999">
+          <a href="apply.html" id="applyLink" style="color:#6366f1;text-decoration:none;">Don't have a key? Apply →</a>
+        </div>
       </div>
       <div>
         <label id="labelModel">Model</label>
@@ -107,6 +110,7 @@ const i18n = {
     errNoKey: "Please enter your API Key",
     errNoPrompt: "Please enter a message",
     metaTemplate: (elapsed, provider, id) => `${elapsed}s · Provider: ${provider} · request_id: ${id}`,
+    applyLink: "Don't have a key? Apply →",
     langBtn: "中文",
   },
   zh: {
@@ -125,6 +129,7 @@ const i18n = {
     errNoKey: "请填入 API Key",
     errNoPrompt: "请输入内容",
     metaTemplate: (elapsed, provider, id) => `耗时 ${elapsed}s · 供应商 ${provider} · request_id ${id}`,
+    applyLink: "没有 Key？点击申请 →",
     langBtn: "English",
   }
 };
@@ -148,6 +153,7 @@ function applyLang() {
   document.getElementById("prompt").placeholder = t.promptPlaceholder;
   document.getElementById("sendBtn").textContent = t.sendBtn;
   document.getElementById("labelReply").textContent = t.labelReply;
+  document.getElementById("applyLink").textContent = t.applyLink;
   document.getElementById("langBtn").textContent = t.langBtn;
   const output = document.getElementById("output");
   if (output.classList.contains("empty")) {

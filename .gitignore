@@ -1,0 +1,33 @@
+# 内部文档（产品策略、PRD、架构设计，不公开）
+docs/
+memory/
+
+# Claude Code 本地配置（含项目级设置，不公开）
+.claude/
+
+# 环境变量（含真实 API Key，绝对不提交）
+.env
+.env.local
+.env.*.local
+
+# 编译产物
+internal/gateway/gateway
+
+# 依赖缓存
+vendor/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# macOS
+.DS_Store
+
+# 日志
+*.log
+
+# 测试覆盖率
+*.out
+coverage.html

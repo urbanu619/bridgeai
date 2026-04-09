@@ -1,6 +1,7 @@
 [build]
 builder = "dockerfile"
 dockerfilePath = "internal/gateway/Dockerfile"
+buildContext = "internal/gateway"
 
 [deploy]
 startCommand = "./gateway"

@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BridgeAI — Apply for API Key</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: #f5f5f5; }
+
+  .container { max-width: 480px; margin: 60px auto; padding: 0 16px; }
+
+  .header { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 4px; }
+  h1 { font-size: 22px; font-weight: 600; }
+  .lang-toggle { font-size: 13px; color: #6366f1; cursor: pointer; user-select: none; }
+  .lang-toggle:hover { text-decoration: underline; }
+  .subtitle { color: #666; font-size: 14px; margin-bottom: 24px; }
+
+  .card { background: #fff; border-radius: 12px; padding: 24px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
+
+  .field { margin-bottom: 16px; }
+  label { font-size: 13px; font-weight: 500; color: #444; display: block; margin-bottom: 6px; }
+  input, textarea, select {
+    width: 100%; padding: 10px 12px; border: 1px solid #e0e0e0;
+    border-radius: 8px; font-size: 14px; outline: none; transition: border 0.2s;
+  }
+  input:focus, textarea:focus, select:focus { border-color: #6366f1; }
+  textarea { resize: vertical; min-height: 80px; line-height: 1.5; }
+
+  button {
+    width: 100%; padding: 11px; background: #6366f1; color: #fff;
+    border: none; border-radius: 8px; font-size: 15px; font-weight: 500;
+    cursor: pointer; transition: background 0.2s; margin-top: 4px;
+  }
+  button:hover { background: #4f46e5; }
+  button:disabled { background: #a5b4fc; cursor: not-allowed; }
+
+  .success {
+    text-align: center; padding: 40px 20px;
+  }
+  .success .icon { font-size: 40px; margin-bottom: 12px; }
+  .success h2 { font-size: 18px; font-weight: 600; margin-bottom: 8px; }
+  .success p { color: #666; font-size: 14px; line-height: 1.6; }
+  .success a { color: #6366f1; text-decoration: none; }
+  .success a:hover { text-decoration: underline; }
+
+  .error { color: #e53e3e; font-size: 13px; margin-top: 10px; }
+
+  .demo-link { text-align: center; margin-top: 16px; font-size: 13px; color: #999; }
+  .demo-link a { color: #6366f1; text-decoration: none; }
+  .demo-link a:hover { text-decoration: underline; }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <h1 id="title">BridgeAI</h1>
+    <span class="lang-toggle" onclick="toggleLang()" id="langBtn">中文</span>
+  </div>
+  <p class="subtitle" id="subtitle">Apply for an API Key to get started</p>
+
+  <div class="card">
+    <div id="formWrap">
+      <div class="field">
+        <label id="labelName">Your Name</label>
+        <input id="name" type="text" placeholder="Jane Doe" />
+      </div>
+      <div class="field">
+        <label id="labelEmail">Email</label>
+        <input id="email" type="email" placeholder="you@example.com" />
+      </div>
+      <div class="field">
+        <label id="labelUse">How will you use BridgeAI?</label>
+        <textarea id="usecase" placeholder="e.g. Building a chatbot, prototyping an AI feature..."></textarea>
+      </div>
+      <button id="submitBtn" onclick="submitForm()">Apply</button>
+      <div id="error" class="error"></div>
+    </div>
+
+    <div id="successWrap" class="success" style="display:none">
+      <div class="icon">✅</div>
+      <h2 id="successTitle">Application received!</h2>
+      <p id="successMsg">We'll review your request and send your API Key to your email within 24 hours.</p>
+    </div>
+  </div>
+
+  <div class="demo-link">
+    <a href="demo.html" id="demoLink">← Try the demo</a>
+  </div>
+</div>
+
+<script>
+const FORMSPREE_URL = "https://formspree.io/f/xvzvjozo";
+
+const i18n = {
+  en: {
+    title: "BridgeAI",
+    subtitle: "Apply for an API Key to get started",
+    labelName: "Your Name",
+    namePlaceholder: "Jane Doe",
+    labelEmail: "Email",
+    emailPlaceholder: "you@example.com",
+    labelUse: "How will you use BridgeAI?",
+    usePlaceholder: "e.g. Building a chatbot, prototyping an AI feature...",
+    submitBtn: "Apply",
+    submitting: "Submitting...",
+    successTitle: "Application received!",
+    successMsg: "We'll review your request and send your API Key to your email within 24 hours.",
+    errName: "Please enter your name",
+    errEmail: "Please enter a valid email",
+    errUse: "Please briefly describe your use case",
+    demoLink: "← Try the demo",
+    langBtn: "中文",
+  },
+  zh: {
+    title: "桥智",
+    subtitle: "申请 API Key，立即开始使用",
+    labelName: "你的名字",
+    namePlaceholder: "张三",
+    labelEmail: "邮箱",
+    emailPlaceholder: "you@example.com",
+    labelUse: "你打算如何使用桥智？",
+    usePlaceholder: "例如：做一个聊天机器人、测试 AI 功能...",
+    submitBtn: "提交申请",
+    submitting: "提交中...",
+    successTitle: "申请已收到！",
+    successMsg: "我们会在 24 小时内审核你的申请，并将 API Key 发送到你的邮箱。",
+    errName: "请填写你的名字",
+    errEmail: "请填写有效的邮箱地址",
+    errUse: "请简单描述一下使用场景",
+    demoLink: "← 体验 Demo",
+    langBtn: "English",
+  }
+};
+
+let lang = "en";
+
+function toggleLang() {
+  lang = lang === "en" ? "zh" : "en";
+  applyLang();
+}
+
+function applyLang() {
+  const t = i18n[lang];
+  document.getElementById("title").textContent = t.title;
+  document.getElementById("subtitle").textContent = t.subtitle;
+  document.getElementById("labelName").textContent = t.labelName;
+  document.getElementById("name").placeholder = t.namePlaceholder;
+  document.getElementById("labelEmail").textContent = t.labelEmail;
+  document.getElementById("email").placeholder = t.emailPlaceholder;
+  document.getElementById("labelUse").textContent = t.labelUse;
+  document.getElementById("usecase").placeholder = t.usePlaceholder;
+  document.getElementById("submitBtn").textContent = t.submitBtn;
+  document.getElementById("successTitle").textContent = t.successTitle;
+  document.getElementById("successMsg").textContent = t.successMsg;
+  document.getElementById("demoLink").textContent = t.demoLink;
+  document.getElementById("langBtn").textContent = t.langBtn;
+  document.documentElement.lang = lang;
+}
+
+async function submitForm() {
+  const t = i18n[lang];
+  const name = document.getElementById("name").value.trim();
+  const email = document.getElementById("email").value.trim();
+  const usecase = document.getElementById("usecase").value.trim();
+  const btn = document.getElementById("submitBtn");
+  const error = document.getElementById("error");
+
+  error.textContent = "";
+  if (!name) { error.textContent = t.errName; return; }
+  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { error.textContent = t.errEmail; return; }
+  if (!usecase) { error.textContent = t.errUse; return; }
+
+  btn.disabled = true;
+  btn.textContent = t.submitting;
+
+  try {
+    const res = await fetch(FORMSPREE_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "Accept": "application/json" },
+      body: JSON.stringify({ name, email, usecase }),
+    });
+
+    if (!res.ok) throw new Error("Submit failed");
+
+    document.getElementById("formWrap").style.display = "none";
+    document.getElementById("successWrap").style.display = "block";
+  } catch (e) {
+    error.textContent = "Something went wrong. Please try again.";
+    btn.disabled = false;
+    btn.textContent = t.submitBtn;
+  }
+}
+</script>
+</body>
+</html>

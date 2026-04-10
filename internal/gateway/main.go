@@ -63,6 +63,12 @@ func buildChain(store *KeyStore) *Chain {
 		} else if k := os.Getenv("GEMINI_API_KEY"); k != "" {
 			_ = k
 			chainEnv = "gemini"
+		} else if k := os.Getenv("OPENROUTER_API_KEY"); k != "" {
+			_ = k
+			chainEnv = "qwen"
+		} else if k := os.Getenv("DEEPSEEK_API_KEY"); k != "" {
+			_ = k
+			chainEnv = "deepseek"
 		}
 	}
 
@@ -94,6 +100,20 @@ func buildChain(store *KeyStore) *Chain {
 			}
 			providers = append(providers, &GeminiProvider{apiKey: key})
 			log.Printf("provider registered: gemini")
+		case "qwen":
+			key := os.Getenv("OPENROUTER_API_KEY")
+			if key == "" {
+				log.Fatalf("PROVIDER_CHAIN includes 'qwen' but OPENROUTER_API_KEY is not set")
+			}
+			providers = append(providers, &QwenProvider{apiKey: key})
+			log.Printf("provider registered: qwen")
+		case "deepseek":
+			key := os.Getenv("DEEPSEEK_API_KEY")
+			if key == "" {
+				log.Fatalf("PROVIDER_CHAIN includes 'deepseek' but DEEPSEEK_API_KEY is not set")
+			}
+			providers = append(providers, &DeepSeekProvider{apiKey: key})
+			log.Printf("provider registered: deepseek")
 		default:
 			log.Fatalf("unknown provider in PROVIDER_CHAIN: %q", name)
 		}

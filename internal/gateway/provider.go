@@ -180,6 +180,72 @@ func (p *GeminiProvider) Send(ctx context.Context, body map[string]any, requestI
 	return sendOpenAICompatible(ctx, "https://generativelanguage.googleapis.com/v1beta/openai", apiKey, b, requestID)
 }
 
+// ---------- Qwen (via OpenRouter, OpenAI-compatible) ----------
+
+type QwenProvider struct {
+	apiKey string
+}
+
+var qwenModelMap = map[string]string{
+	"smart-quality":             "qwen/qwen3-235b-a22b",
+	"smart-fast":                "qwen/qwen3-30b-a3b",
+	"qwen3-235b":                "qwen/qwen3-235b-a22b",
+	"qwen3-30b":                 "qwen/qwen3-30b-a3b",
+	"qwen/qwen3-235b-a22b":     "qwen/qwen3-235b-a22b",
+	"qwen/qwen3-30b-a3b":       "qwen/qwen3-30b-a3b",
+}
+
+func (p *QwenProvider) Type() string         { return "qwen" }
+func (p *QwenProvider) NeedsTransform() bool { return false }
+
+func (p *QwenProvider) Send(ctx context.Context, body map[string]any, requestID string, byokKey string) (*http.Response, error) {
+	b := copyBody(body)
+	if m, ok := b["model"].(string); ok {
+		if resolved, ok := qwenModelMap[m]; ok {
+			b["model"] = resolved
+		}
+	} else {
+		b["model"] = "qwen/qwen3-30b-a3b"
+	}
+	apiKey := p.apiKey
+	if byokKey != "" {
+		apiKey = byokKey
+	}
+	return sendOpenAICompatible(ctx, "https://openrouter.ai/api/v1", apiKey, b, requestID)
+}
+
+// ---------- DeepSeek (OpenAI-compatible) ----------
+
+type DeepSeekProvider struct {
+	apiKey string
+}
+
+var deepseekModelMap = map[string]string{
+	"smart-quality":        "deepseek-chat",
+	"smart-fast":           "deepseek-chat",
+	"deepseek-chat":        "deepseek-chat",
+	"deepseek-reasoner":    "deepseek-reasoner",
+}
+
+func (p *DeepSeekProvider) Type() string         { return "deepseek" }
+func (p *DeepSeekProvider) NeedsTransform() bool { return false }
+
+func (p *DeepSeekProvider) Send(ctx context.Context, body map[string]any, requestID string, byokKey string) (*http.Response, error) {
+	b := copyBody(body)
+	if m, ok := b["model"].(string); ok {
+		if resolved, ok := deepseekModelMap[m]; ok {
+			b["model"] = resolved
+		}
+	} else {
+		b["model"] = "deepseek-chat"
+	}
+	apiKey := p.apiKey
+	if byokKey != "" {
+		apiKey = byokKey
+	}
+	return sendOpenAICompatible(ctx, "https://api.deepseek.com/v1", apiKey, b, requestID)
+}
+
 // ---------- helpers ----------
 
 // sendOpenAICompatible sends body to any OpenAI-compatible base URL.

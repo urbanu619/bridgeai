@@ -36,7 +36,7 @@ var anthropicModelMap = map[string]string{
 	"claude-3-5-haiku-latest":  "claude-3-5-haiku-latest",
 }
 
-func (p *AnthropicProvider) Type() string { return "anthropic" }
+func (p *AnthropicProvider) Type() string { return "claude" }
 func (p *AnthropicProvider) NeedsTransform() bool { return true }
 
 func (p *AnthropicProvider) Send(ctx context.Context, body map[string]any, requestID string, byokKey string) (*http.Response, error) {
@@ -244,6 +244,113 @@ func (p *DeepSeekProvider) Send(ctx context.Context, body map[string]any, reques
 		apiKey = byokKey
 	}
 	return sendOpenAICompatible(ctx, "https://api.deepseek.com/v1", apiKey, b, requestID)
+}
+
+// ---------- OpenAI ----------
+
+type OpenAIProvider struct {
+	apiKey string
+}
+
+var openaiModelMap = map[string]string{
+	"smart-quality": "gpt-4o",
+	"smart-fast":    "gpt-4o-mini",
+	"gpt-4o":        "gpt-4o",
+	"gpt-4o-mini":   "gpt-4o-mini",
+	"o3":            "o3",
+	"o4-mini":       "o4-mini",
+}
+
+func (p *OpenAIProvider) Type() string         { return "openai" }
+func (p *OpenAIProvider) NeedsTransform() bool { return false }
+
+// openaiReasoningModels do not support streaming.
+var openaiReasoningModels = map[string]bool{"o3": true, "o4-mini": true}
+
+func (p *OpenAIProvider) Send(ctx context.Context, body map[string]any, requestID string, byokKey string) (*http.Response, error) {
+	b := copyBody(body)
+	model := "gpt-4o-mini"
+	if m, ok := b["model"].(string); ok {
+		if resolved, ok := openaiModelMap[m]; ok {
+			model = resolved
+		} else {
+			model = m
+		}
+	}
+	b["model"] = model
+	// Reasoning models do not support streaming.
+	if openaiReasoningModels[model] {
+		delete(b, "stream")
+	}
+	apiKey := p.apiKey
+	if byokKey != "" {
+		apiKey = byokKey
+	}
+	return sendOpenAICompatible(ctx, "https://api.openai.com/v1", apiKey, b, requestID)
+}
+
+// ---------- Mistral ----------
+
+type MistralProvider struct {
+	apiKey string
+}
+
+var mistralModelMap = map[string]string{
+	"smart-quality":    "mistral-large-latest",
+	"smart-fast":       "mistral-small-latest",
+	"mistral-large":    "mistral-large-latest",
+	"mistral-small":    "mistral-small-latest",
+}
+
+func (p *MistralProvider) Type() string         { return "mistral" }
+func (p *MistralProvider) NeedsTransform() bool { return false }
+
+func (p *MistralProvider) Send(ctx context.Context, body map[string]any, requestID string, byokKey string) (*http.Response, error) {
+	b := copyBody(body)
+	if m, ok := b["model"].(string); ok {
+		if resolved, ok := mistralModelMap[m]; ok {
+			b["model"] = resolved
+		}
+	} else {
+		b["model"] = "mistral-small-latest"
+	}
+	apiKey := p.apiKey
+	if byokKey != "" {
+		apiKey = byokKey
+	}
+	return sendOpenAICompatible(ctx, "https://api.mistral.ai/v1", apiKey, b, requestID)
+}
+
+// ---------- Grok (xAI, OpenAI-compatible) ----------
+
+type GrokProvider struct {
+	apiKey string
+}
+
+var grokModelMap = map[string]string{
+	"smart-quality": "grok-3",
+	"smart-fast":    "grok-3-mini",
+	"grok-3":        "grok-3",
+	"grok-3-mini":   "grok-3-mini",
+}
+
+func (p *GrokProvider) Type() string         { return "grok" }
+func (p *GrokProvider) NeedsTransform() bool { return false }
+
+func (p *GrokProvider) Send(ctx context.Context, body map[string]any, requestID string, byokKey string) (*http.Response, error) {
+	b := copyBody(body)
+	if m, ok := b["model"].(string); ok {
+		if resolved, ok := grokModelMap[m]; ok {
+			b["model"] = resolved
+		}
+	} else {
+		b["model"] = "grok-3-fast"
+	}
+	apiKey := p.apiKey
+	if byokKey != "" {
+		apiKey = byokKey
+	}
+	return sendOpenAICompatible(ctx, "https://api.x.ai/v1", apiKey, b, requestID)
 }
 
 // ---------- helpers ----------

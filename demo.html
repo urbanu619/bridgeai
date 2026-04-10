@@ -70,10 +70,34 @@
         <select id="model">
           <option value="smart-fast" id="optFast">smart-fast (Fast)</option>
           <option value="smart-quality" id="optQuality">smart-quality (Quality)</option>
-          <option value="deepseek-chat" id="optDeepseek">DeepSeek V3</option>
-          <option value="deepseek-reasoner" id="optReasoner">DeepSeek R1 (Reasoning)</option>
-          <option value="qwen3-235b" id="optQwen235">Qwen3 235B (Quality)</option>
-          <option value="qwen3-30b" id="optQwen30">Qwen3 30B (Fast)</option>
+          <optgroup label="OpenAI">
+            <option value="gpt-4o" id="optGPT4o">GPT-4o</option>
+            <option value="gpt-4o-mini" id="optGPT4oMini">GPT-4o mini</option>
+            <option value="o4-mini" id="optO4Mini">o4-mini (Reasoning, non-streaming)</option>
+          </optgroup>
+          <optgroup label="Claude">
+            <option value="claude-3-5-sonnet-latest" id="optSonnet">Claude 3.5 Sonnet</option>
+            <option value="claude-3-5-haiku-latest" id="optHaiku">Claude 3.5 Haiku</option>
+          </optgroup>
+          <optgroup label="DeepSeek">
+            <option value="deepseek-chat" id="optDeepseek">DeepSeek V3</option>
+            <option value="deepseek-reasoner" id="optReasoner">DeepSeek R1 (Reasoning)</option>
+          </optgroup>
+          <optgroup label="Qwen">
+            <option value="qwen3-235b" id="optQwen235">Qwen3 235B (Quality)</option>
+            <option value="qwen3-30b" id="optQwen30">Qwen3 30B (Fast)</option>
+          </optgroup>
+          <optgroup label="Grok">
+            <option value="grok-3" id="optGrok3">Grok-3</option>
+            <option value="grok-3-mini" id="optGrok3Mini">Grok-3 mini</option>
+          </optgroup>
+          <optgroup label="Mistral">
+            <option value="mistral-large" id="optMistralLarge">Mistral Large</option>
+            <option value="mistral-small" id="optMistralSmall">Mistral Small</option>
+          </optgroup>
+          <optgroup label="Gemini">
+            <option value="gemini-2.0-flash" id="optGemini">Gemini 2.0 Flash</option>
+          </optgroup>
         </select>
       </div>
     </div>
@@ -103,12 +127,6 @@ const i18n = {
     subtitle: "Multi-model routing gateway · Enter your key to get started",
     labelKey: "API Key",
     labelModel: "Model",
-    optFast: "smart-fast (Fast)",
-    optQuality: "smart-quality (Quality)",
-    optDeepseek: "DeepSeek V3",
-    optReasoner: "DeepSeek R1 (Reasoning)",
-    optQwen235: "Qwen3 235B (Quality)",
-    optQwen30: "Qwen3 30B (Fast)",
     labelPrompt: "Message",
     promptPlaceholder: "Type your question here...",
     sendBtn: "Send",
@@ -126,12 +144,6 @@ const i18n = {
     subtitle: "多模型路由网关 · 填入 Key 即可使用",
     labelKey: "API Key",
     labelModel: "模型",
-    optFast: "smart-fast（快速）",
-    optQuality: "smart-quality（高质量）",
-    optDeepseek: "DeepSeek V3",
-    optReasoner: "DeepSeek R1（推理）",
-    optQwen235: "Qwen3 235B（高质量）",
-    optQwen30: "Qwen3 30B（快速）",
     labelPrompt: "消息内容",
     promptPlaceholder: "输入你想问的问题...",
     sendBtn: "发送",
@@ -159,12 +171,6 @@ function applyLang() {
   document.getElementById("subtitle").textContent = t.subtitle;
   document.getElementById("labelKey").textContent = t.labelKey;
   document.getElementById("labelModel").textContent = t.labelModel;
-  document.getElementById("optFast").textContent = t.optFast;
-  document.getElementById("optQuality").textContent = t.optQuality;
-  document.getElementById("optDeepseek").textContent = t.optDeepseek;
-  document.getElementById("optReasoner").textContent = t.optReasoner;
-  document.getElementById("optQwen235").textContent = t.optQwen235;
-  document.getElementById("optQwen30").textContent = t.optQwen30;
   document.getElementById("labelPrompt").textContent = t.labelPrompt;
   document.getElementById("prompt").placeholder = t.promptPlaceholder;
   document.getElementById("sendBtn").textContent = t.sendBtn;

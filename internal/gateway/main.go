@@ -46,7 +46,7 @@ func buildKeyStore() *KeyStore {
 	return ks
 }
 
-// buildChain reads PROVIDER_CHAIN (e.g. "groq,anthropic") and builds the fallback chain.
+// buildChain reads PROVIDER_CHAIN (e.g. "groq,claude") and builds the fallback chain.
 // Limits are read from the KeyStore: keys with a ":<limit>" suffix get a monthly USD budget.
 // Falls back to any single configured key if PROVIDER_CHAIN is not set.
 func buildChain(store *KeyStore) *Chain {
@@ -56,19 +56,29 @@ func buildChain(store *KeyStore) *Chain {
 	if chainEnv == "" {
 		// Auto-detect from available keys.
 		if k := os.Getenv("GROQ_API_KEY"); k != "" {
+			_ = k
 			chainEnv = "groq"
 		} else if k := os.Getenv("ANTHROPIC_API_KEY"); k != "" {
 			_ = k
-			chainEnv = "anthropic"
+			chainEnv = "claude"
 		} else if k := os.Getenv("GEMINI_API_KEY"); k != "" {
 			_ = k
 			chainEnv = "gemini"
-		} else if k := os.Getenv("OPENROUTER_API_KEY"); k != "" {
-			_ = k
-			chainEnv = "qwen"
 		} else if k := os.Getenv("DEEPSEEK_API_KEY"); k != "" {
 			_ = k
 			chainEnv = "deepseek"
+		} else if k := os.Getenv("OPENAI_API_KEY"); k != "" {
+			_ = k
+			chainEnv = "openai"
+		} else if k := os.Getenv("MISTRAL_API_KEY"); k != "" {
+			_ = k
+			chainEnv = "mistral"
+		} else if k := os.Getenv("XAI_API_KEY"); k != "" {
+			_ = k
+			chainEnv = "grok"
+		} else if k := os.Getenv("OPENROUTER_API_KEY"); k != "" {
+			_ = k
+			chainEnv = "qwen"
 		}
 	}
 
@@ -79,13 +89,13 @@ func buildChain(store *KeyStore) *Chain {
 	for _, name := range strings.Split(chainEnv, ",") {
 		name = strings.TrimSpace(name)
 		switch name {
-		case "anthropic":
+		case "claude", "anthropic": // "anthropic" kept for backward compatibility
 			key := os.Getenv("ANTHROPIC_API_KEY")
 			if key == "" {
-				log.Fatalf("PROVIDER_CHAIN includes 'anthropic' but ANTHROPIC_API_KEY is not set")
+				log.Fatalf("PROVIDER_CHAIN includes %q but ANTHROPIC_API_KEY is not set", name)
 			}
 			providers = append(providers, &AnthropicProvider{apiKey: key})
-			log.Printf("provider registered: anthropic")
+			log.Printf("provider registered: claude")
 		case "groq":
 			key := os.Getenv("GROQ_API_KEY")
 			if key == "" {
@@ -100,13 +110,6 @@ func buildChain(store *KeyStore) *Chain {
 			}
 			providers = append(providers, &GeminiProvider{apiKey: key})
 			log.Printf("provider registered: gemini")
-		case "qwen":
-			key := os.Getenv("OPENROUTER_API_KEY")
-			if key == "" {
-				log.Fatalf("PROVIDER_CHAIN includes 'qwen' but OPENROUTER_API_KEY is not set")
-			}
-			providers = append(providers, &QwenProvider{apiKey: key})
-			log.Printf("provider registered: qwen")
 		case "deepseek":
 			key := os.Getenv("DEEPSEEK_API_KEY")
 			if key == "" {
@@ -114,6 +117,34 @@ func buildChain(store *KeyStore) *Chain {
 			}
 			providers = append(providers, &DeepSeekProvider{apiKey: key})
 			log.Printf("provider registered: deepseek")
+		case "qwen":
+			key := os.Getenv("OPENROUTER_API_KEY")
+			if key == "" {
+				log.Fatalf("PROVIDER_CHAIN includes 'qwen' but OPENROUTER_API_KEY is not set")
+			}
+			providers = append(providers, &QwenProvider{apiKey: key})
+			log.Printf("provider registered: qwen")
+		case "openai":
+			key := os.Getenv("OPENAI_API_KEY")
+			if key == "" {
+				log.Fatalf("PROVIDER_CHAIN includes 'openai' but OPENAI_API_KEY is not set")
+			}
+			providers = append(providers, &OpenAIProvider{apiKey: key})
+			log.Printf("provider registered: openai")
+		case "mistral":
+			key := os.Getenv("MISTRAL_API_KEY")
+			if key == "" {
+				log.Fatalf("PROVIDER_CHAIN includes 'mistral' but MISTRAL_API_KEY is not set")
+			}
+			providers = append(providers, &MistralProvider{apiKey: key})
+			log.Printf("provider registered: mistral")
+		case "grok":
+			key := os.Getenv("XAI_API_KEY")
+			if key == "" {
+				log.Fatalf("PROVIDER_CHAIN includes 'grok' but XAI_API_KEY is not set")
+			}
+			providers = append(providers, &GrokProvider{apiKey: key})
+			log.Printf("provider registered: grok")
 		default:
 			log.Fatalf("unknown provider in PROVIDER_CHAIN: %q", name)
 		}

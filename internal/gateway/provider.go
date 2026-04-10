@@ -386,6 +386,107 @@ func (p *ZhipuProvider) Send(ctx context.Context, body map[string]any, requestID
 	return sendOpenAICompatible(ctx, "https://open.bigmodel.cn/api/paas/v4", apiKey, b, requestID)
 }
 
+// ---------- Kimi / Moonshot AI (OpenAI-compatible) ----------
+
+type KimiProvider struct {
+	apiKey string
+}
+
+var kimiModelMap = map[string]string{
+	"smart-quality":    "kimi-k2.5",
+	"smart-fast":       "moonshot-v1-8k",
+	"kimi-k2.5":        "kimi-k2.5",
+	"moonshot-v1-8k":   "moonshot-v1-8k",
+	"moonshot-v1-32k":  "moonshot-v1-32k",
+	"moonshot-v1-128k": "moonshot-v1-128k",
+}
+
+func (p *KimiProvider) Type() string         { return "kimi" }
+func (p *KimiProvider) NeedsTransform() bool { return false }
+
+func (p *KimiProvider) Send(ctx context.Context, body map[string]any, requestID string, byokKey string) (*http.Response, error) {
+	b := copyBody(body)
+	if m, ok := b["model"].(string); ok {
+		if resolved, ok := kimiModelMap[m]; ok {
+			b["model"] = resolved
+		}
+	} else {
+		b["model"] = "moonshot-v1-8k"
+	}
+	apiKey := p.apiKey
+	if byokKey != "" {
+		apiKey = byokKey
+	}
+	return sendOpenAICompatible(ctx, "https://api.moonshot.ai/v1", apiKey, b, requestID)
+}
+
+// ---------- MiniMax (OpenAI-compatible) ----------
+
+type MiniMaxProvider struct {
+	apiKey string
+}
+
+var minimaxModelMap = map[string]string{
+	"smart-quality":          "MiniMax-M2.7",
+	"smart-fast":             "MiniMax-M2.7-highspeed",
+	"MiniMax-M2.7":           "MiniMax-M2.7",
+	"MiniMax-M2.7-highspeed": "MiniMax-M2.7-highspeed",
+	"MiniMax-M2.5":           "MiniMax-M2.5",
+}
+
+func (p *MiniMaxProvider) Type() string         { return "minimax" }
+func (p *MiniMaxProvider) NeedsTransform() bool { return false }
+
+func (p *MiniMaxProvider) Send(ctx context.Context, body map[string]any, requestID string, byokKey string) (*http.Response, error) {
+	b := copyBody(body)
+	if m, ok := b["model"].(string); ok {
+		if resolved, ok := minimaxModelMap[m]; ok {
+			b["model"] = resolved
+		}
+	} else {
+		b["model"] = "MiniMax-M2.7-highspeed"
+	}
+	apiKey := p.apiKey
+	if byokKey != "" {
+		apiKey = byokKey
+	}
+	return sendOpenAICompatible(ctx, "https://api.minimax.io/v1", apiKey, b, requestID)
+}
+
+// ---------- 豆包 / Doubao (ByteDance Ark, OpenAI-compatible) ----------
+
+type DoubaoProvider struct {
+	apiKey string
+}
+
+var doubaoModelMap = map[string]string{
+	"smart-quality":          "doubao-1.5-pro-32k",
+	"smart-fast":             "doubao-seed-1-6-flash",
+	"doubao-1.5-pro-32k":    "doubao-1.5-pro-32k",
+	"doubao-1.5-pro-256k":   "doubao-1.5-pro-256k",
+	"doubao-seed-1-6":        "doubao-seed-1-6",
+	"doubao-seed-1-6-flash":  "doubao-seed-1-6-flash",
+}
+
+func (p *DoubaoProvider) Type() string         { return "doubao" }
+func (p *DoubaoProvider) NeedsTransform() bool { return false }
+
+func (p *DoubaoProvider) Send(ctx context.Context, body map[string]any, requestID string, byokKey string) (*http.Response, error) {
+	b := copyBody(body)
+	if m, ok := b["model"].(string); ok {
+		if resolved, ok := doubaoModelMap[m]; ok {
+			b["model"] = resolved
+		}
+	} else {
+		b["model"] = "doubao-seed-1-6-flash"
+	}
+	apiKey := p.apiKey
+	if byokKey != "" {
+		apiKey = byokKey
+	}
+	return sendOpenAICompatible(ctx, "https://ark.cn-beijing.volces.com/api/v3", apiKey, b, requestID)
+}
+
 // ---------- helpers ----------
 
 // sendOpenAICompatible sends body to any OpenAI-compatible base URL.

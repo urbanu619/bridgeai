@@ -82,6 +82,15 @@ func buildChain(store *KeyStore) *Chain {
 		} else if k := os.Getenv("ZHIPU_API_KEY"); k != "" {
 			_ = k
 			chainEnv = "zhipu"
+		} else if k := os.Getenv("MOONSHOT_API_KEY"); k != "" {
+			_ = k
+			chainEnv = "kimi"
+		} else if k := os.Getenv("MINIMAX_API_KEY"); k != "" {
+			_ = k
+			chainEnv = "minimax"
+		} else if k := os.Getenv("ARK_API_KEY"); k != "" {
+			_ = k
+			chainEnv = "doubao"
 		}
 	}
 
@@ -155,6 +164,27 @@ func buildChain(store *KeyStore) *Chain {
 			}
 			providers = append(providers, &ZhipuProvider{apiKey: key})
 			log.Printf("provider registered: zhipu")
+		case "kimi":
+			key := os.Getenv("MOONSHOT_API_KEY")
+			if key == "" {
+				log.Fatalf("PROVIDER_CHAIN includes 'kimi' but MOONSHOT_API_KEY is not set")
+			}
+			providers = append(providers, &KimiProvider{apiKey: key})
+			log.Printf("provider registered: kimi")
+		case "minimax":
+			key := os.Getenv("MINIMAX_API_KEY")
+			if key == "" {
+				log.Fatalf("PROVIDER_CHAIN includes 'minimax' but MINIMAX_API_KEY is not set")
+			}
+			providers = append(providers, &MiniMaxProvider{apiKey: key})
+			log.Printf("provider registered: minimax")
+		case "doubao":
+			key := os.Getenv("ARK_API_KEY")
+			if key == "" {
+				log.Fatalf("PROVIDER_CHAIN includes 'doubao' but ARK_API_KEY is not set")
+			}
+			providers = append(providers, &DoubaoProvider{apiKey: key})
+			log.Printf("provider registered: doubao")
 		default:
 			log.Fatalf("unknown provider in PROVIDER_CHAIN: %q", name)
 		}

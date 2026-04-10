@@ -79,6 +79,9 @@ func buildChain(store *KeyStore) *Chain {
 		} else if k := os.Getenv("OPENROUTER_API_KEY"); k != "" {
 			_ = k
 			chainEnv = "qwen"
+		} else if k := os.Getenv("ZHIPU_API_KEY"); k != "" {
+			_ = k
+			chainEnv = "zhipu"
 		}
 	}
 
@@ -145,6 +148,13 @@ func buildChain(store *KeyStore) *Chain {
 			}
 			providers = append(providers, &GrokProvider{apiKey: key})
 			log.Printf("provider registered: grok")
+		case "zhipu":
+			key := os.Getenv("ZHIPU_API_KEY")
+			if key == "" {
+				log.Fatalf("PROVIDER_CHAIN includes 'zhipu' but ZHIPU_API_KEY is not set")
+			}
+			providers = append(providers, &ZhipuProvider{apiKey: key})
+			log.Printf("provider registered: zhipu")
 		default:
 			log.Fatalf("unknown provider in PROVIDER_CHAIN: %q", name)
 		}

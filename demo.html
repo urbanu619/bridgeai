@@ -98,6 +98,10 @@
           <optgroup label="Gemini">
             <option value="gemini-2.0-flash" id="optGemini">Gemini 2.0 Flash</option>
           </optgroup>
+          <optgroup id="optgroupZhipu" label="Zhipu GLM · Tsinghua-backed · China's Top Choice">
+            <option value="glm-4-plus">GLM-4 Plus</option>
+            <option value="glm-4-flash">GLM-4 Flash (Free)</option>
+          </optgroup>
         </select>
       </div>
     </div>
@@ -136,6 +140,7 @@ const i18n = {
     errNoKey: "Please enter your API Key",
     errNoPrompt: "Please enter a message",
     metaTemplate: (elapsed, provider, id) => `${elapsed}s · Provider: ${provider} · request_id: ${id}`,
+    optgroupZhipu: "Zhipu GLM · Tsinghua-backed · China's Top Choice",
     applyLink: "Don't have a key? Apply →",
     langBtn: "中文",
   },
@@ -153,6 +158,7 @@ const i18n = {
     errNoKey: "请填入 API Key",
     errNoPrompt: "请输入内容",
     metaTemplate: (elapsed, provider, id) => `耗时 ${elapsed}s · 供应商 ${provider} · request_id ${id}`,
+    optgroupZhipu: "智谱 GLM · 清华系 · 国产首选",
     applyLink: "没有 Key？点击申请 →",
     langBtn: "English",
   }
@@ -175,6 +181,7 @@ function applyLang() {
   document.getElementById("prompt").placeholder = t.promptPlaceholder;
   document.getElementById("sendBtn").textContent = t.sendBtn;
   document.getElementById("labelReply").textContent = t.labelReply;
+  document.getElementById("optgroupZhipu").label = t.optgroupZhipu;
   document.getElementById("applyLink").textContent = t.applyLink;
   document.getElementById("langBtn").textContent = t.langBtn;
   const output = document.getElementById("output");

@@ -353,6 +353,39 @@ func (p *GrokProvider) Send(ctx context.Context, body map[string]any, requestID 
 	return sendOpenAICompatible(ctx, "https://api.x.ai/v1", apiKey, b, requestID)
 }
 
+// ---------- Zhipu AI / GLM (OpenAI-compatible) ----------
+
+type ZhipuProvider struct {
+	apiKey string
+}
+
+var zhipuModelMap = map[string]string{
+	"smart-quality": "glm-4-plus",
+	"smart-fast":    "glm-4-flash",
+	"glm-4-plus":    "glm-4-plus",
+	"glm-4-flash":   "glm-4-flash",
+	"glm-4":         "glm-4",
+}
+
+func (p *ZhipuProvider) Type() string         { return "zhipu" }
+func (p *ZhipuProvider) NeedsTransform() bool { return false }
+
+func (p *ZhipuProvider) Send(ctx context.Context, body map[string]any, requestID string, byokKey string) (*http.Response, error) {
+	b := copyBody(body)
+	if m, ok := b["model"].(string); ok {
+		if resolved, ok := zhipuModelMap[m]; ok {
+			b["model"] = resolved
+		}
+	} else {
+		b["model"] = "glm-4-flash"
+	}
+	apiKey := p.apiKey
+	if byokKey != "" {
+		apiKey = byokKey
+	}
+	return sendOpenAICompatible(ctx, "https://open.bigmodel.cn/api/paas/v4", apiKey, b, requestID)
+}
+
 // ---------- helpers ----------
 
 // sendOpenAICompatible sends body to any OpenAI-compatible base URL.

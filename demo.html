@@ -70,6 +70,10 @@
         <select id="model">
           <option value="smart-fast" id="optFast">smart-fast (Fast)</option>
           <option value="smart-quality" id="optQuality">smart-quality (Quality)</option>
+          <option value="deepseek-chat" id="optDeepseek">DeepSeek V3</option>
+          <option value="deepseek-reasoner" id="optReasoner">DeepSeek R1 (Reasoning)</option>
+          <option value="qwen3-235b" id="optQwen235">Qwen3 235B (Quality)</option>
+          <option value="qwen3-30b" id="optQwen30">Qwen3 30B (Fast)</option>
         </select>
       </div>
     </div>
@@ -101,6 +105,10 @@ const i18n = {
     labelModel: "Model",
     optFast: "smart-fast (Fast)",
     optQuality: "smart-quality (Quality)",
+    optDeepseek: "DeepSeek V3",
+    optReasoner: "DeepSeek R1 (Reasoning)",
+    optQwen235: "Qwen3 235B (Quality)",
+    optQwen30: "Qwen3 30B (Fast)",
     labelPrompt: "Message",
     promptPlaceholder: "Type your question here...",
     sendBtn: "Send",
@@ -120,6 +128,10 @@ const i18n = {
     labelModel: "模型",
     optFast: "smart-fast（快速）",
     optQuality: "smart-quality（高质量）",
+    optDeepseek: "DeepSeek V3",
+    optReasoner: "DeepSeek R1（推理）",
+    optQwen235: "Qwen3 235B（高质量）",
+    optQwen30: "Qwen3 30B（快速）",
     labelPrompt: "消息内容",
     promptPlaceholder: "输入你想问的问题...",
     sendBtn: "发送",
@@ -149,6 +161,10 @@ function applyLang() {
   document.getElementById("labelModel").textContent = t.labelModel;
   document.getElementById("optFast").textContent = t.optFast;
   document.getElementById("optQuality").textContent = t.optQuality;
+  document.getElementById("optDeepseek").textContent = t.optDeepseek;
+  document.getElementById("optReasoner").textContent = t.optReasoner;
+  document.getElementById("optQwen235").textContent = t.optQwen235;
+  document.getElementById("optQwen30").textContent = t.optQwen30;
   document.getElementById("labelPrompt").textContent = t.labelPrompt;
   document.getElementById("prompt").placeholder = t.promptPlaceholder;
   document.getElementById("sendBtn").textContent = t.sendBtn;

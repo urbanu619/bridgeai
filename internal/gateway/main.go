@@ -91,6 +91,9 @@ func buildChain(store *KeyStore) *Chain {
 		} else if k := os.Getenv("ARK_API_KEY"); k != "" {
 			_ = k
 			chainEnv = "doubao"
+		} else if k := os.Getenv("MIMO_API_KEY"); k != "" {
+			_ = k
+			chainEnv = "mimo"
 		}
 	}
 
@@ -185,6 +188,13 @@ func buildChain(store *KeyStore) *Chain {
 			}
 			providers = append(providers, &DoubaoProvider{apiKey: key})
 			log.Printf("provider registered: doubao")
+		case "mimo":
+			key := os.Getenv("MIMO_API_KEY")
+			if key == "" {
+				log.Fatalf("PROVIDER_CHAIN includes 'mimo' but MIMO_API_KEY is not set")
+			}
+			providers = append(providers, &MiMoProvider{apiKey: key})
+			log.Printf("provider registered: mimo")
 		default:
 			log.Fatalf("unknown provider in PROVIDER_CHAIN: %q", name)
 		}

@@ -487,6 +487,38 @@ func (p *DoubaoProvider) Send(ctx context.Context, body map[string]any, requestI
 	return sendOpenAICompatible(ctx, "https://ark.cn-beijing.volces.com/api/v3", apiKey, b, requestID)
 }
 
+// ---------- MiMo / Xiaomi (OpenAI-compatible) ----------
+
+type MiMoProvider struct {
+	apiKey string
+}
+
+var mimoModelMap = map[string]string{
+	"smart-quality":  "mimo-v2-pro",
+	"smart-fast":     "mimo-v2-omni",
+	"mimo-v2-pro":    "mimo-v2-pro",
+	"mimo-v2-omni":   "mimo-v2-omni",
+}
+
+func (p *MiMoProvider) Type() string         { return "mimo" }
+func (p *MiMoProvider) NeedsTransform() bool { return false }
+
+func (p *MiMoProvider) Send(ctx context.Context, body map[string]any, requestID string, byokKey string) (*http.Response, error) {
+	b := copyBody(body)
+	if m, ok := b["model"].(string); ok {
+		if resolved, ok := mimoModelMap[m]; ok {
+			b["model"] = resolved
+		}
+	} else {
+		b["model"] = "mimo-v2-omni"
+	}
+	apiKey := p.apiKey
+	if byokKey != "" {
+		apiKey = byokKey
+	}
+	return sendOpenAICompatible(ctx, "https://api.xiaomimimo.com/v1", apiKey, b, requestID)
+}
+
 // ---------- helpers ----------
 
 // sendOpenAICompatible sends body to any OpenAI-compatible base URL.

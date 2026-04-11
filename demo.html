@@ -64,6 +64,9 @@
         <div style="margin-top:5px;font-size:12px;color:#999">
           <a href="apply.html" id="applyLink" style="color:#6366f1;text-decoration:none;">Don't have a key? Apply →</a>
         </div>
+        <div style="margin-top:4px;font-size:12px;color:#999">
+          <a href="https://t.me/BridgeAI_Gateway" target="_blank" id="communityLink" style="color:#6366f1;text-decoration:none;">Join community →</a>
+        </div>
       </div>
       <div>
         <label id="labelModel">Model</label>
@@ -158,6 +161,7 @@ const i18n = {
     metaTemplate: (elapsed, provider, id) => `${elapsed}s · Provider: ${provider} · request_id: ${id}`,
     optgroupZhipu: "Zhipu GLM · Tsinghua-backed · China's Top Choice",
     applyLink: "Don't have a key? Apply →",
+    communityLink: "Join community →",
     langBtn: "中文",
   },
   zh: {
@@ -176,6 +180,7 @@ const i18n = {
     metaTemplate: (elapsed, provider, id) => `耗时 ${elapsed}s · 供应商 ${provider} · request_id ${id}`,
     optgroupZhipu: "智谱 GLM · 清华系 · 国产首选",
     applyLink: "没有 Key？点击申请 →",
+    communityLink: "加入用户群 →",
     langBtn: "English",
   }
 };
@@ -199,6 +204,7 @@ function applyLang() {
   document.getElementById("labelReply").textContent = t.labelReply;
   document.getElementById("optgroupZhipu").label = t.optgroupZhipu;
   document.getElementById("applyLink").textContent = t.applyLink;
+  document.getElementById("communityLink").textContent = t.communityLink;
   document.getElementById("langBtn").textContent = t.langBtn;
   const output = document.getElementById("output");
   if (output.classList.contains("empty")) {

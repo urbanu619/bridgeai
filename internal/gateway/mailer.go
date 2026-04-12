@@ -9,23 +9,23 @@ import (
 	"os"
 )
 
-// SendKeyEmail sends the issued API key to the applicant via Resend API.
+// SendKeyEmail sends the issued API key to the applicant via Postmark API.
 func SendKeyEmail(toEmail, apiKey string) error {
-	resendKey := os.Getenv("RESEND_API_KEY")
-	if resendKey == "" {
-		return fmt.Errorf("RESEND_API_KEY not set")
+	token := os.Getenv("POSTMARK_TOKEN")
+	if token == "" {
+		return fmt.Errorf("POSTMARK_TOKEN not set")
 	}
 
 	from := os.Getenv("RESEND_FROM")
 	if from == "" {
-		from = "BridgeAI <onboarding@resend.dev>"
+		from = "BridgeAI <noreply@dnsv4.cn>"
 	}
 
 	body := map[string]any{
-		"from":    from,
-		"to":      []string{toEmail},
-		"subject": "Your BridgeAI API Key",
-		"text": fmt.Sprintf(`Hi,
+		"From":    from,
+		"To":      toEmail,
+		"Subject": "Your BridgeAI API Key",
+		"TextBody": fmt.Sprintf(`Hi,
 
 Your BridgeAI API Key is ready:
 
@@ -48,12 +48,13 @@ If you have any questions, reply to this email.
 	}
 
 	raw, _ := json.Marshal(body)
-	req, err := http.NewRequest(http.MethodPost, "https://api.resend.com/emails", bytes.NewReader(raw))
+	req, err := http.NewRequest(http.MethodPost, "https://api.postmarkapp.com/email", bytes.NewReader(raw))
 	if err != nil {
 		return err
 	}
-	req.Header.Set("Authorization", "Bearer "+resendKey)
+	req.Header.Set("X-Postmark-Server-Token", token)
 	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Accept", "application/json")
 
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
@@ -63,7 +64,7 @@ If you have any questions, reply to this email.
 
 	if resp.StatusCode >= 300 {
 		b, _ := io.ReadAll(resp.Body)
-		return fmt.Errorf("resend API error %d: %s", resp.StatusCode, string(b))
+		return fmt.Errorf("postmark API error %d: %s", resp.StatusCode, string(b))
 	}
 	return nil
 }

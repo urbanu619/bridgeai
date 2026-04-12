@@ -25,6 +25,7 @@ func main() {
 	// Admin routes (protected by ADMIN_TOKEN)
 	admin := r.Group("/admin", AdminAuthMiddleware())
 	admin.POST("/issue-key", IssueKeyHandler(store))
+	admin.GET("/keys", ListKeysHandler(store))
 
 	r.Use(AuthMiddleware(store))
 	r.POST("/v1/chat/completions", chain.ChatCompletions)

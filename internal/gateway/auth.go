@@ -59,10 +59,14 @@ type KeyStore struct {
 // NewKeyStore parses a comma-separated list of "key" or "key:limit" entries.
 // Example: "bridge-key-001:5.00,bridge-key-002"
 func NewKeyStore(raw string) *KeyStore {
+	keysFile := os.Getenv("KEYS_FILE")
+	if keysFile == "" {
+		keysFile = "/data/keys.json"
+	}
 	ks := &KeyStore{
 		keys:   make(map[string]struct{}),
 		limits: make(map[string]float64),
-		file:   "keys.json",
+		file:   keysFile,
 	}
 	for _, entry := range strings.Split(raw, ",") {
 		entry = strings.TrimSpace(entry)
@@ -126,6 +130,22 @@ func (ks *KeyStore) Issue(email string, budget float64) (string, error) {
 		return "", err
 	}
 	return key, nil
+}
+
+// ListIssued returns all dynamically issued keys from the file.
+func (ks *KeyStore) ListIssued() ([]IssuedKey, error) {
+	data, err := os.ReadFile(ks.file)
+	if os.IsNotExist(err) {
+		return []IssuedKey{}, nil
+	}
+	if err != nil {
+		return nil, err
+	}
+	var issued []IssuedKey
+	if err := json.Unmarshal(data, &issued); err != nil {
+		return nil, err
+	}
+	return issued, nil
 }
 
 func (ks *KeyStore) appendToFile(entry IssuedKey) error {

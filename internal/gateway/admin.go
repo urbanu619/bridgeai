@@ -30,6 +30,21 @@ type issueKeyRequest struct {
 	Budget float64 `json:"budget"` // monthly USD limit, 0 = unlimited
 }
 
+// ListKeysHandler returns all issued keys from the store's file.
+func ListKeysHandler(store *KeyStore) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		issued, err := store.ListIssued()
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+		c.JSON(http.StatusOK, gin.H{
+			"total": len(issued),
+			"keys":  issued,
+		})
+	}
+}
+
 // IssueKeyHandler generates a new key, saves it, and emails it to the applicant.
 func IssueKeyHandler(store *KeyStore) gin.HandlerFunc {
 	return func(c *gin.Context) {

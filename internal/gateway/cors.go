@@ -16,7 +16,7 @@ func CORSMiddleware() gin.HandlerFunc {
 		c.Header("Access-Control-Allow-Origin", "*")
 		c.Header("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
 		c.Header("Access-Control-Allow-Headers", corsAllowHeaders)
-		c.Header("Access-Control-Expose-Headers", "X-Request-ID")
+		c.Header("Access-Control-Expose-Headers", "X-Request-ID, X-BridgeAI-Request-Id, X-BridgeAI-Provider")
 		c.Header("Access-Control-Max-Age", "86400")
 
 		if c.Request.Method == http.MethodOptions {

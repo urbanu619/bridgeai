@@ -93,6 +93,8 @@ func (ch *Chain) ChatCompletions(c *gin.Context) {
 		// Non-retryable: deliver to client.
 		log.Printf("[%s] provider=%s status=%d stream=%v", requestID, p.Type(), resp.StatusCode, stream)
 		c.Header("X-Request-ID", requestID)
+		c.Header("X-BridgeAI-Request-Id", requestID)
+		c.Header("X-BridgeAI-Provider", p.Type())
 
 		if resp.StatusCode != http.StatusOK {
 			b, _ := io.ReadAll(resp.Body)

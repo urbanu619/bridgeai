@@ -21,6 +21,11 @@ func main() {
 	r.GET("/health", func(c *gin.Context) {
 		c.JSON(200, gin.H{"status": "ok"})
 	})
+
+	// Admin routes (protected by ADMIN_TOKEN)
+	admin := r.Group("/admin", AdminAuthMiddleware())
+	admin.POST("/issue-key", IssueKeyHandler(store))
+
 	r.Use(AuthMiddleware(store))
 	r.POST("/v1/chat/completions", chain.ChatCompletions)
 
@@ -35,13 +40,13 @@ func main() {
 	}
 }
 
-// buildKeyStore loads BRIDGE_API_KEYS (comma-separated) from env.
+// buildKeyStore loads BRIDGE_API_KEYS (comma-separated) from env, then loads issued keys from file.
 func buildKeyStore() *KeyStore {
 	raw := os.Getenv("BRIDGE_API_KEYS")
-	if raw == "" {
-		log.Fatal("BRIDGE_API_KEYS is not set. Add at least one key to .env")
-	}
 	ks := NewKeyStore(raw)
+	if err := ks.LoadFromFile(); err != nil {
+		log.Printf("warning: could not load keys.json: %v", err)
+	}
 	log.Printf("key store loaded: %d key(s)", len(ks.keys))
 	return ks
 }

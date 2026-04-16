@@ -14,20 +14,25 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// AuthMiddleware validates the Bearer token against the configured key set.
-// Keys are loaded once at startup from the keyStore.
+// AuthMiddleware validates the Bridge Key against the configured key set.
+// Accepts either "Authorization: Bearer <key>" (OpenAI-compatible clients) or
+// "x-api-key: <key>" (Anthropic-native clients such as Claude Code).
 func AuthMiddleware(store *KeyStore) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		header := c.GetHeader("Authorization")
-		if !strings.HasPrefix(header, "Bearer ") {
+		var token string
+		if h := c.GetHeader("Authorization"); strings.HasPrefix(h, "Bearer ") {
+			token = strings.TrimPrefix(h, "Bearer ")
+		} else {
+			token = c.GetHeader("x-api-key")
+		}
+
+		if token == "" {
 			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
-				"error":      "missing or malformed Authorization header",
+				"error":      "missing Authorization or x-api-key header",
 				"request_id": c.GetString("request_id"),
 			})
 			return
 		}
-
-		token := strings.TrimPrefix(header, "Bearer ")
 		if !store.Valid(token) {
 			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
 				"error":      "invalid API key",

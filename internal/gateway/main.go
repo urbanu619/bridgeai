@@ -30,6 +30,12 @@ func main() {
 	r.Use(AuthMiddleware(store))
 	r.POST("/v1/chat/completions", chain.ChatCompletions)
 
+	if anthropicKey := os.Getenv("ANTHROPIC_API_KEY"); anthropicKey != "" {
+		mp := &MessagesPassthrough{apiKey: anthropicKey, budget: chain.budget}
+		r.POST("/v1/messages", mp.Handle)
+		log.Printf("anthropic passthrough registered: POST /v1/messages")
+	}
+
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = "8080"
